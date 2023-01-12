@@ -122,3 +122,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Promise Changes
+
+- Added generate.sh file so that the generator can be run without needed to build it locally first
+- Added additionalProperties: false to the generated typebox schema to prevent arbitrary properties
+- Added $id to all schema names to prevent duplicate names and unblock AJV compilation
+- Changed output to use single quotes instead of double quotes for strings
+- Moved model IDs and file names to unify around underscores
+- Removed unnecessary `Examples` code

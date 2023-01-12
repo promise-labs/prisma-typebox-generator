@@ -70,12 +70,12 @@ const transformModel = (model: DMMF.Model, models?: DMMF.Model[]) => {
   let raw = [
     `${models ? '' : `export const ${model.name} = `}Type.Object({\n\t`,
     fields.rawString,
-    '})',
+    `}, {\n\t$id: \'#${model.name}_model\', \n\tadditionalProperties: false\n})`,
   ].join('\n');
   let inputRaw = [
     `${models ? '' : `export const ${model.name}Input = `}Type.Object({\n\t`,
     fields.rawInputString,
-    '})',
+    `}, {\n\t$id: \'#${model.name}_input_model\', \n\tadditionalProperties: false\n})`,
   ].join('\n');
 
   if (Array.isArray(models)) {
@@ -111,7 +111,7 @@ export const transformEnum = (enm: DMMF.DatamodelEnum) => {
 export function transformDMMF(dmmf: DMMF.Document) {
   const { models, enums } = dmmf.datamodel;
   const importStatements = new Set([
-    'import {Type, Static} from "@sinclair/typebox"',
+    'import {Type, Static} from \'@sinclair/typebox\'',
   ]);
 
   return [
