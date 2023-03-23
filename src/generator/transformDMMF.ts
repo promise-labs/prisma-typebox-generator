@@ -67,17 +67,19 @@ const transformFields = (fields: DMMF.Field[]) => {
   };
 };
 
+let depCount = 0;
 const transformModel = (model: DMMF.Model, models?: DMMF.Model[]) => {
+  depCount++;
   const fields = transformFields(model.fields);
   let raw = [
     `${models ? '' : `export const ${model.name} = `}Type.Object({\n\t`,
     fields.rawString,
-    `}, {\n\t$id: \'#${model.name}_model\', \n\tadditionalProperties: false\n})`,
+    `}, {\n\t$id: \'#${!Array.isArray(models) || models.length === 0 ? model.name : `${model.name}_dep_${depCount}`}_model\', \n\tadditionalProperties: false\n})`,
   ].join('\n');
   let inputRaw = [
     `${models ? '' : `export const ${model.name}Input = `}Type.Object({\n\t`,
     fields.rawInputString,
-    `}, {\n\t$id: \'#${model.name}_input_model\', \n\tadditionalProperties: false\n})`,
+    `}, {\n\t$id: \'#${!Array.isArray(models) || models.length === 0 ? model.name : `${model.name}_dep_${depCount}`}_input_model\', \n\tadditionalProperties: false\n})`,
   ].join('\n');
 
   if (Array.isArray(models)) {
@@ -123,10 +125,22 @@ export function transformDMMF(dmmf: DMMF.Document) {
       [...deps].forEach((d) => {
         const depsModel = models.find((m) => m.name === d) as DMMF.Model;
         if (depsModel) {
-          const replacer = transformModel(depsModel, models);
+          const output = transformModel(depsModel, models);
+          let depRaw = output.raw;
+          let depInputRaw = output.inputRaw;
+          // Handle case where relation is first field in model
+          const firstCommaIndex = depRaw.indexOf(",");
+          if (firstCommaIndex !== -1 && firstCommaIndex < depRaw.indexOf(":")) {
+            depRaw = depRaw.slice(0, firstCommaIndex) + depRaw.slice(firstCommaIndex + 1);
+          }
+          const firstCommaIndexInput = depInputRaw.indexOf(",");
+          if (firstCommaIndexInput !== -1 && firstCommaIndexInput < depInputRaw.indexOf(":")) {
+            depInputRaw = depInputRaw.slice(0, firstCommaIndexInput) + depInputRaw.slice(firstCommaIndexInput + 1);
+          }
+
           const re = new RegExp(`::${d}::`, 'gm');
-          raw = raw.replace(re, replacer.raw);
-          inputRaw = inputRaw.replace(re, replacer.inputRaw);
+          raw = raw.replace(re, depRaw);
+          inputRaw = inputRaw.replace(re, depInputRaw);
         }
       });
 

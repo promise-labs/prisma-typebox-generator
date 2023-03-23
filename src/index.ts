@@ -14,6 +14,7 @@ generatorHandler({
   },
   async onGenerate(options) {
     const payload = transformDMMF(options.dmmf);
+
     if (options.generator.output) {
       const outputDir =
         // This ensures previous version of prisma are still supported
