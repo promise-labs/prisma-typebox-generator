@@ -104,10 +104,10 @@ export const transformEnum = (enm: DMMF.DatamodelEnum) => {
     .join('');
 
   return [
-    `export const ${enm.name}Const = {`,
+    `const ${enm.name}Const = {`,
     values,
     '}\n',
-    `export const ${enm.name} = Type.KeyOf(Type.Object(${enm.name}Const))\n`,
+    `export const ${enm.name} = Type.KeyOf(Type.Object(${enm.name}Const, { $id: '#${enm.name}', additionalProperties: false }))\n`,
     `export type ${enm.name}Type = Static<typeof ${enm.name}>`,
   ].join('\n');
 };
